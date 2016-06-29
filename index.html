@@ -1,5 +1,17 @@
 <!doctype html>
 <html>
 <head><title>todos</title></head>
-<body><h1>todos</h1></body>
+<body>
+<h1>todos</h1>
+<input type="text" id="myInput">
+<script>
+    document.addEventListener("DOMContentLoaded", setFocusOnInput);
+
+    function setFocusOnInput() {
+        var myInput = document.getElementById("myInput");
+
+        myInput.focus();
+    }
+</script>
+</body>
 </html>
