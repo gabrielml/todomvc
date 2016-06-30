@@ -4,13 +4,38 @@
 <body>
 <h1>todos</h1>
 <input type="text" id="myInput">
+<ul id="myList"></ul>
+
 <script>
     document.addEventListener("DOMContentLoaded", setFocusOnInput);
+    document.addEventListener("DOMContentLoaded", registerInputBehavior);
 
     function setFocusOnInput() {
         var myInput = document.getElementById("myInput");
 
         myInput.focus();
+    }
+
+    function registerInputBehavior() {
+        var myInput = document.getElementById("myInput");
+
+        myInput.addEventListener("keypress", addListItem);
+
+        function addListItem(event) {
+            if (event.keyCode === 13) {
+                var inputValue = event.target.value.trim();
+
+                if (inputValue.length > 0) {
+                    var myListItem = document.createElement("li");
+                    myListItem.textContent = inputValue;
+
+                    var myList = document.getElementById("myList");
+                    myList.appendChild(myListItem);
+
+                    event.target.value = "";
+                }
+            }
+        }
     }
 </script>
 </body>
