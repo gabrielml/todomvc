@@ -26,13 +26,26 @@
                 var inputValue = event.target.value.trim();
 
                 if (inputValue.length > 0) {
+                    var myListItemText = document.createElement("span");
+                    myListItemText.textContent = inputValue;
+
+                    var myListItemIcon = document.createElement("span");
+                    myListItemIcon.textContent = "  x";
+                    myListItemIcon.addEventListener("click", deleteListItem);
+                    myListItemIcon.style.cursor = "pointer";
+
                     var myListItem = document.createElement("li");
-                    myListItem.textContent = inputValue;
+                    myListItem.appendChild(myListItemText);
+                    myListItem.appendChild(myListItemIcon);
 
                     var myList = document.getElementById("myList");
                     myList.appendChild(myListItem);
 
                     event.target.value = "";
+
+                    function deleteListItem() {
+                        myList.removeChild(myListItem);
+                    }
                 }
             }
         }
