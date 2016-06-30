@@ -1,6 +1,9 @@
 <!doctype html>
 <html>
-<head><title>todos</title></head>
+<head>
+    <title>todos</title>
+    <link rel="stylesheet" href="index.css">
+</head>
 <body>
 <h1>todos</h1>
 <input type="text" id="myInput">
@@ -32,7 +35,7 @@
                     var myListItemIcon = document.createElement("span");
                     myListItemIcon.textContent = "  x";
                     myListItemIcon.addEventListener("click", deleteListItem);
-                    myListItemIcon.style.cursor = "pointer";
+                    myListItemIcon.className = "delete";
 
                     var myListItem = document.createElement("li");
                     myListItem.appendChild(myListItemText);
