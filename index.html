@@ -2,12 +2,15 @@
 <html>
 <head>
     <title>todos</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 </head>
 <body>
-<h1>todos</h1>
-<input type="text" id="myInput">
-<ul id="myList"></ul>
+<div class="container">
+    <h1 class="jumbotron">todos</h1>
+    <input type="text" id="myInput" class="form-control">
+    <br/>
+    <ul id="myList" class="list-group"></ul>
+</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", setFocusOnInput);
@@ -32,12 +35,13 @@
                     var myListItemText = document.createElement("span");
                     myListItemText.textContent = inputValue;
 
-                    var myListItemIcon = document.createElement("span");
-                    myListItemIcon.textContent = "  x";
+                    var myListItemIcon = document.createElement("button");
+                    myListItemIcon.className = "close";
                     myListItemIcon.addEventListener("click", deleteListItem);
-                    myListItemIcon.className = "delete";
+                    myListItemIcon.innerHTML = "<span>&times;</span>";
 
                     var myListItem = document.createElement("li");
+                    myListItem.className = "list-group-item";
                     myListItem.appendChild(myListItemText);
                     myListItem.appendChild(myListItemIcon);
 
