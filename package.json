@@ -1,0 +1,18 @@
+{
+  "name": "todomvc",
+  "version": "0.0.0",
+  "description": "My first todomvc application.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielml/todomvc.git"
+  },
+  "author": "Gabriel Mijares <gabrielmljob@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gabrielml/todomvc/issues"
+  },
+  "homepage": "https://github.com/gabrielml/todomvc#readme"
+}
