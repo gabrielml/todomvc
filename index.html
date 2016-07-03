@@ -16,7 +16,8 @@
 </div>
 
 <script>
-    var todos = [];
+    var todos = load();
+    render(todos);
 
     document.addEventListener('DOMContentLoaded', setFocusOnInput);
     document.addEventListener('DOMContentLoaded', registerInputBehavior);
@@ -39,6 +40,7 @@
                 if (inputValue.length > 0) {
                     todos.push(inputValue);
 
+                    save(todos);
                     render(todos);
 
                     event.target.value = '';
@@ -73,9 +75,22 @@
             function deleteListItem() {
                 todos.splice(todoIndex, 1);
 
+                save(todos);
                 render(todos);
             }
         }
+    }
+
+    function load() {
+        var todosAsString = localStorage.getItem('todos');
+
+        return JSON.parse(todosAsString) || [];
+    }
+
+    function save(todos) {
+        var todosAsString = JSON.stringify(todos);
+
+        localStorage.setItem('todos', todosAsString);
     }
 </script>
 </body>
