@@ -16,42 +16,42 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", setFocusOnInput);
-    document.addEventListener("DOMContentLoaded", registerInputBehavior);
+    document.addEventListener('DOMContentLoaded', setFocusOnInput);
+    document.addEventListener('DOMContentLoaded', registerInputBehavior);
 
     function setFocusOnInput() {
-        var myInput = document.getElementById("myInput");
+        var myInput = document.getElementById('myInput');
 
         myInput.focus();
     }
 
     function registerInputBehavior() {
-        var myInput = document.getElementById("myInput");
+        var myInput = document.getElementById('myInput');
 
-        myInput.addEventListener("keypress", addListItem);
+        myInput.addEventListener('keypress', addListItem);
 
         function addListItem(event) {
             if (event.keyCode === 13) {
                 var inputValue = event.target.value.trim();
 
                 if (inputValue.length > 0) {
-                    var myListItemText = document.createElement("span");
+                    var myListItemText = document.createElement('span');
                     myListItemText.textContent = inputValue;
 
-                    var myListItemIcon = document.createElement("button");
-                    myListItemIcon.className = "close";
-                    myListItemIcon.addEventListener("click", deleteListItem);
-                    myListItemIcon.innerHTML = "<span>&times;</span>";
+                    var myListItemIcon = document.createElement('button');
+                    myListItemIcon.className = 'close';
+                    myListItemIcon.addEventListener('click', deleteListItem);
+                    myListItemIcon.innerHTML = '<span>&times;</span>';
 
-                    var myListItem = document.createElement("li");
-                    myListItem.className = "list-group-item";
+                    var myListItem = document.createElement('li');
+                    myListItem.className = 'list-group-item';
                     myListItem.appendChild(myListItemText);
                     myListItem.appendChild(myListItemIcon);
 
-                    var myList = document.getElementById("myList");
+                    var myList = document.getElementById('myList');
                     myList.appendChild(myListItem);
 
-                    event.target.value = "";
+                    event.target.value = '';
 
                     function deleteListItem() {
                         myList.removeChild(myListItem);
