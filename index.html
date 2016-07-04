@@ -15,6 +15,7 @@
     <ul id="myList" class="list-group"></ul>
 </div>
 
+<script src="templates.js"></script>
 <script>
     var todos = load();
     render(todos);
@@ -87,22 +88,25 @@
         todos.forEach(renderListItem);
 
         function renderListItem(todo, todoIndex) {
-            var myListItemLabel = document.createElement('label');
-            myListItemLabel.innerHTML = '<input type="checkbox"' + (todo.completed ? ' checked="true"' : '') + '>&nbsp;' + todo.title;
-            var input = myListItemLabel.getElementsByTagName('input')[0];
-            input.addEventListener('change', toggleState);
-
-            var myListItemIcon = document.createElement('button');
-            myListItemIcon.className = 'close';
-            myListItemIcon.addEventListener('click', removeListItem);
-            myListItemIcon.innerHTML = '<span>&times;</span>';
-
-            var myListItem = document.createElement('li');
-            myListItem.className = 'list-group-item';
-            myListItem.appendChild(myListItemLabel);
-            myListItem.appendChild(myListItemIcon);
+            var template = [
+                '<li class="list-group-item">',
+                '   <label>',
+                '       <input type="checkbox" {{completed ? \' checked="true"\' : \'\'}}>&nbsp;{{title}}',
+                '   </label>',
+                '   <button class="close">',
+                '       <span>&times;</span>',
+                '   </button>',
+                '</li>'
+            ].join('\n');
+            var myListItem = compileTemplate(template, todo);
 
             myList.appendChild(myListItem);
+
+            var itemCompleted = myListItem.getElementsByTagName('input')[0];
+            itemCompleted.addEventListener('change', toggleState);
+
+            var itemRemove = myListItem.getElementsByTagName('button')[0];
+            itemRemove.addEventListener('click', removeListItem);
 
             function removeListItem() {
                 var removeAction = {
