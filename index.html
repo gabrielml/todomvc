@@ -38,15 +38,34 @@
                 var inputValue = event.target.value.trim();
 
                 if (inputValue.length > 0) {
-                    todos.push(inputValue);
+                    var createAction = {
+                        type: 'CREATE_TODO',
+                        payload: inputValue
+                    };
 
-                    save(todos);
-                    render(todos);
+                    dispatch(createAction);
 
                     event.target.value = '';
                 }
             }
         }
+    }
+
+    function dispatch(action) {
+        switch(action.type) {
+            case 'CREATE_TODO':
+                todos.push(action.payload);
+                save(todos);
+                render(todos);
+            break;
+            case 'REMOVE_TODO':
+                todos.splice(action.payload, 1);
+                save(todos);
+                render(todos);
+            break;
+            default:
+                throw new Error('Action not supported: ' + action.type);
+        };
     }
 
     function render(todos) {
@@ -62,7 +81,7 @@
 
             var myListItemIcon = document.createElement('button');
             myListItemIcon.className = 'close';
-            myListItemIcon.addEventListener('click', deleteListItem);
+            myListItemIcon.addEventListener('click', removeListItem);
             myListItemIcon.innerHTML = '<span>&times;</span>';
 
             var myListItem = document.createElement('li');
@@ -72,11 +91,13 @@
 
             myList.appendChild(myListItem);
 
-            function deleteListItem() {
-                todos.splice(todoIndex, 1);
+            function removeListItem() {
+                var removeAction = {
+                    type: 'REMOVE_TODO',
+                    payload: todoIndex
+                };
 
-                save(todos);
-                render(todos);
+                dispatch(removeAction);
             }
         }
     }
