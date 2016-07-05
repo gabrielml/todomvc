@@ -13,7 +13,11 @@
     <input type="text" id="myInput" class="form-control">
     <br/>
     <ul id="myList" class="list-group"></ul>
-    <div id="myFilter"></div>
+    <div>
+        <span id="myCounter"></span>
+        &nbsp;
+        <span id="myFilter"></span>
+    </div>
 </div>
 
 <script src="templates.js"></script>
@@ -96,7 +100,20 @@
 
     function render(todos, filter) {
         renderList(todos, filter);
+        renderCounter(todos);
         renderFilter(filter);
+
+        function renderCounter(todos) {
+            var myCounter = document.getElementById('myCounter');
+
+            myCounter.textContent = todos.reduce(countCompleted, 0) + ' items left';
+
+            function countCompleted(accumulator, todo) {
+                accumulator += todo.completed ? 0 : 1;
+
+                return accumulator;
+            }
+        }
 
         function renderFilter(filter) {
             var myFilter = document.getElementById('myFilter');
