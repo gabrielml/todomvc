@@ -183,7 +183,8 @@
                 var template = [
                     '<li class="list-group-item">',
                     '   <label>',
-                    '       <input type="checkbox" {{completed ? \' checked="true"\' : \'\'}}>&nbsp;{{title}}',
+                    '       <input type="checkbox" {{completed ? \' checked="true"\' : \'\'}}>&nbsp;',
+                    '              {{completed ? \'<s>\' : \'\'}}{{title}}{{completed ? \'</s>\' : \'\'}}',
                     '   </label>',
                     '   <button class="close">',
                     '       <span>&times;</span>',
