@@ -17,6 +17,8 @@
         <span id="myCounter"></span>
         &nbsp;
         <span id="myFilter"></span>
+        &nbsp;
+        <button class="btn btn-danger btn-xs" onclick="dispatchClearCompletedAction()">Clear completed</button>
     </div>
 </div>
 
@@ -36,6 +38,14 @@
         };
 
         dispatch(setFilterAction);
+    }
+
+    function dispatchClearCompletedAction() {
+        var clearCompletedAction = {
+            type: 'CLEAR_COMPLETED'
+        };
+
+        dispatch(clearCompletedAction);
     }
 
     function setFocusOnInput() {
@@ -90,6 +100,12 @@
             break;
             case 'SET_FILTER':
                 filter = action.payload;
+            break;
+            case 'CLEAR_COMPLETED':
+                todos = todos.filter(function (todo) {
+                    return !todo.completed;
+                });
+                save(todos);
             break;
             default:
                 throw new Error('Action not supported: ' + action.type);
