@@ -13,9 +13,7 @@
     <input type="text" id="myInput" class="form-control">
     <br/>
     <ul id="myList" class="list-group"></ul>
-    <button type="button" class="btn btn-default btn-xs" onclick="dispatchFilterAction('ALL')">All</button>
-    <button type="button" class="btn btn-default btn-xs" onclick="dispatchFilterAction('COMPLETED')">Completed</button>
-    <button type="button" class="btn btn-default btn-xs" onclick="dispatchFilterAction('ACTIVE')">Active</button>
+    <div id="myFilter"></div>
 </div>
 
 <script src="templates.js"></script>
@@ -97,64 +95,95 @@
     }
 
     function render(todos, filter) {
-        var myList = document.getElementById('myList');
+        renderList(todos, filter);
+        renderFilter(filter);
 
-        myList.textContent = '';
+        function renderFilter(filter) {
+            var myFilter = document.getElementById('myFilter');
 
-        todos
-            .filter(applyFilter)
-            .forEach(renderListItem);
+            myFilter.textContent = '';
 
-        function applyFilter(todo) {
-            switch(filter) {
-                case 'ALL':
-                    return true;
-                case 'COMPLETED':
-                    return todo.completed;
-                case 'ACTIVE':
-                    return !todo.completed;
-                default:
-                    throw new Error('Filter not supported: ' + filter);
+            var template = [
+                '<span>',
+                '   <button type="button" class="btn {{active ? \'btn-success\' : \'btn-default\'}} btn-xs" ',
+                '           onclick="dispatchFilterAction(\'{{filterType}}\')">',
+                '       {{filterName}}',
+                '   </button>',
+                '   &nbsp;',
+                '</span>'
+            ].join('\n');
+
+            [
+                {filterType: 'ALL', filterName: 'All', active: filter === 'ALL'},
+                {filterType: 'COMPLETED', filterName: 'Completed', active: filter === 'COMPLETED'},
+                {filterType: 'ACTIVE', filterName: 'Active', active: filter === 'ACTIVE'}
+            ].forEach(renderFilterButton);
+
+            function renderFilterButton(filterButton) {
+                myFilter.appendChild(compileTemplate(template, filterButton));
             }
         }
 
-        function renderListItem(todo, todoIndex) {
-            var template = [
-                '<li class="list-group-item">',
-                '   <label>',
-                '       <input type="checkbox" {{completed ? \' checked="true"\' : \'\'}}>&nbsp;{{title}}',
-                '   </label>',
-                '   <button class="close">',
-                '       <span>&times;</span>',
-                '   </button>',
-                '</li>'
-            ].join('\n');
-            var myListItem = compileTemplate(template, todo);
+        function renderList(todos, filter) {
+            var myList = document.getElementById('myList');
 
-            myList.appendChild(myListItem);
+            myList.textContent = '';
 
-            var itemCompleted = myListItem.getElementsByTagName('input')[0];
-            itemCompleted.addEventListener('change', toggleState);
+            todos
+                .filter(applyFilter)
+                .forEach(renderListItem);
 
-            var itemRemove = myListItem.getElementsByTagName('button')[0];
-            itemRemove.addEventListener('click', removeListItem);
-
-            function removeListItem() {
-                var removeAction = {
-                    type: 'REMOVE_TODO',
-                    payload: todoIndex
-                };
-
-                dispatch(removeAction);
+            function applyFilter(todo) {
+                switch(filter) {
+                    case 'ALL':
+                        return true;
+                    case 'COMPLETED':
+                        return todo.completed;
+                    case 'ACTIVE':
+                        return !todo.completed;
+                    default:
+                        throw new Error('Filter not supported: ' + filter);
+                }
             }
 
-            function toggleState() {
-                var toggleAction = {
-                    type: 'TOGGLE_TODO_STATE',
-                    payload: todoIndex
-                };
+            function renderListItem(todo, todoIndex) {
+                var template = [
+                    '<li class="list-group-item">',
+                    '   <label>',
+                    '       <input type="checkbox" {{completed ? \' checked="true"\' : \'\'}}>&nbsp;{{title}}',
+                    '   </label>',
+                    '   <button class="close">',
+                    '       <span>&times;</span>',
+                    '   </button>',
+                    '</li>'
+                ].join('\n');
+                var myListItem = compileTemplate(template, todo);
 
-                dispatch(toggleAction);
+                myList.appendChild(myListItem);
+
+                var itemCompleted = myListItem.getElementsByTagName('input')[0];
+                itemCompleted.addEventListener('change', toggleState);
+
+                var itemRemove = myListItem.getElementsByTagName('button')[0];
+                itemRemove.addEventListener('click', removeListItem);
+
+                function removeListItem() {
+                    var removeAction = {
+                        type: 'REMOVE_TODO',
+                        payload: todoIndex
+                    };
+
+                    dispatch(removeAction);
+                }
+
+                function toggleState() {
+                    var toggleAction = {
+                        type: 'TOGGLE_TODO_STATE',
+                        payload: todoIndex
+                    };
+
+                    dispatch(toggleAction);
+                }
             }
         }
     }
