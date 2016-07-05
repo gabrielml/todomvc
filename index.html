@@ -13,15 +13,28 @@
     <input type="text" id="myInput" class="form-control">
     <br/>
     <ul id="myList" class="list-group"></ul>
+    <button type="button" class="btn btn-default btn-xs" onclick="dispatchFilterAction('ALL')">All</button>
+    <button type="button" class="btn btn-default btn-xs" onclick="dispatchFilterAction('COMPLETED')">Completed</button>
+    <button type="button" class="btn btn-default btn-xs" onclick="dispatchFilterAction('ACTIVE')">Active</button>
 </div>
 
 <script src="templates.js"></script>
 <script>
     var todos = load();
-    render(todos);
+    var filter = 'ALL';
+    render(todos, filter);
 
     document.addEventListener('DOMContentLoaded', setFocusOnInput);
     document.addEventListener('DOMContentLoaded', registerInputBehavior);
+
+    function dispatchFilterAction(filterType) {
+        var setFilterAction = {
+            type: 'SET_FILTER',
+            payload: filterType,
+        };
+
+        dispatch(setFilterAction);
+    }
 
     function setFocusOnInput() {
         var myInput = document.getElementById('myInput');
@@ -62,30 +75,48 @@
 
                 todos.push(todo);
                 save(todos);
-                render(todos);
             break;
             case 'REMOVE_TODO':
                 todos.splice(action.payload, 1);
                 save(todos);
-                render(todos);
             break;
             case 'TOGGLE_TODO_STATE':
                 var todo = todos[action.payload];
+
                 todo.completed = !todo.completed;
                 save(todos);
-                render(todos);
+            break;
+            case 'SET_FILTER':
+                filter = action.payload;
             break;
             default:
                 throw new Error('Action not supported: ' + action.type);
         };
+
+        render(todos, filter);
     }
 
-    function render(todos) {
+    function render(todos, filter) {
         var myList = document.getElementById('myList');
 
         myList.textContent = '';
 
-        todos.forEach(renderListItem);
+        todos
+            .filter(applyFilter)
+            .forEach(renderListItem);
+
+        function applyFilter(todo) {
+            switch(filter) {
+                case 'ALL':
+                    return true;
+                case 'COMPLETED':
+                    return todo.completed;
+                case 'ACTIVE':
+                    return !todo.completed;
+                default:
+                    throw new Error('Filter not supported: ' + filter);
+            }
+        }
 
         function renderListItem(todo, todoIndex) {
             var template = [
