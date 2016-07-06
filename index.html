@@ -78,7 +78,7 @@
     }
 
     function dispatch(action) {
-        switch(action.type) {
+        switch (action.type) {
             case 'CREATE_TODO':
                 var todo = {
                     title: action.payload,
@@ -87,29 +87,29 @@
 
                 todos.push(todo);
                 save(todos);
-            break;
+                break;
             case 'REMOVE_TODO':
                 todos.splice(action.payload, 1);
                 save(todos);
-            break;
+                break;
             case 'TOGGLE_TODO_STATE':
                 var todo = todos[action.payload];
 
                 todo.completed = !todo.completed;
                 save(todos);
-            break;
+                break;
             case 'SET_FILTER':
                 filter = action.payload;
-            break;
+                break;
             case 'CLEAR_COMPLETED':
                 todos = todos.filter(function (todo) {
                     return !todo.completed;
                 });
                 save(todos);
-            break;
+                break;
             default:
                 throw new Error('Action not supported: ' + action.type);
-        };
+        }
 
         render(todos, filter);
     }
@@ -163,11 +163,11 @@
             myList.textContent = '';
 
             todos
-                .filter(applyFilter)
-                .forEach(renderListItem);
+                    .filter(applyFilter)
+                    .forEach(renderListItem);
 
             function applyFilter(todo) {
-                switch(filter) {
+                switch (filter) {
                     case 'ALL':
                         return true;
                     case 'COMPLETED':
@@ -193,7 +193,7 @@
                 ].join('\n');
                 var myListItem = compileTemplate(template, todo);
 
-                myList.appendChild(myListItem);
+                document.getElementById('myList').appendChild(myListItem);
 
                 var itemCompleted = myListItem.getElementsByTagName('input')[0];
                 itemCompleted.addEventListener('change', toggleState);
