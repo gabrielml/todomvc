@@ -81,6 +81,7 @@
         switch (action.type) {
             case 'CREATE_TODO':
                 var todo = {
+                    id: Date.now(),
                     title: action.payload,
                     completed: false
                 };
@@ -89,23 +90,28 @@
                 save(todos);
                 break;
             case 'REMOVE_TODO':
-                todos.splice(action.payload, 1);
+                todos = todos.filter(function (todo) {
+                    return todo.id !== action.payload;
+                });
                 save(todos);
                 break;
             case 'TOGGLE_TODO_STATE':
-                var todo = todos[action.payload];
-
-                todo.completed = !todo.completed;
+                todos = todos.map(function (todo) {
+                    if (todo.id === action.payload) {
+                        todo.completed = !todo.completed;
+                    }
+                    return todo;
+                });
                 save(todos);
-                break;
-            case 'SET_FILTER':
-                filter = action.payload;
                 break;
             case 'CLEAR_COMPLETED':
                 todos = todos.filter(function (todo) {
                     return !todo.completed;
                 });
                 save(todos);
+                break;
+            case 'SET_FILTER':
+                filter = action.payload;
                 break;
             default:
                 throw new Error('Action not supported: ' + action.type);
@@ -179,7 +185,7 @@
                 }
             }
 
-            function renderListItem(todo, todoIndex) {
+            function renderListItem(todo) {
                 var template = [
                     '<li class="list-group-item">',
                     '   <label>',
@@ -204,7 +210,7 @@
                 function removeListItem() {
                     var removeAction = {
                         type: 'REMOVE_TODO',
-                        payload: todoIndex
+                        payload: todo.id
                     };
 
                     dispatch(removeAction);
@@ -213,7 +219,7 @@
                 function toggleState() {
                     var toggleAction = {
                         type: 'TOGGLE_TODO_STATE',
-                        payload: todoIndex
+                        payload: todo.id
                     };
 
                     dispatch(toggleAction);
