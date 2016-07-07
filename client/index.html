@@ -7,7 +7,7 @@
     <title>todos</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 </head>
-<body onload="setFocusOnInput()">
+<body onload="initialize()">
 <div class="container">
     <h1 class="jumbotron">todos</h1>
     <input type="text" id="myInput" class="form-control" onkeypress="addListItem(event)">
@@ -18,195 +18,34 @@
         &nbsp;
         <span id="myFilter"></span>
         &nbsp;
-        <button class="btn btn-danger btn-xs" onclick="dispatchClearCompletedAction()">Clear completed</button>
+        <button class="btn btn-danger btn-xs" onclick="dispatch('CLEAR_COMPLETED');">Clear completed</button>
     </div>
 </div>
 
 <script src="templates.js"></script>
+<script src="dispatcher.js"></script>
+<script src="renderer.js"></script>
 <script>
     var todos = [];
     var filter = 'ALL';
 
-    dispatch(createAction('LOAD_TODO_ITEMS'));
+    function initialize() {
+        document.getElementById('myInput').focus();
+        dispatch('LOAD_TODO_ITEMS');
+    }
 
     function dispatchSetFilterAction(filterType) {
-        dispatch(createAction('SET_FILTER', filterType));
-    }
-
-    function dispatchClearCompletedAction() {
-        dispatch(createAction('CLEAR_COMPLETED'));
-    }
-
-    function setFocusOnInput() {
-        document.getElementById('myInput').focus();
+        dispatch('SET_FILTER', filterType);
     }
 
     function addListItem(event) {
         var inputValue = event.target.value.trim();
 
         if (event.keyCode === 13 && inputValue.length > 0) {
-            dispatch(createAction('CREATE_TODO', inputValue));
+            dispatch('CREATE_TODO', inputValue);
 
             event.target.value = '';
         }
-    }
-
-    function dispatch(action) {
-        switch (action.type) {
-            case 'CREATE_TODO':
-                var todo = {
-                    id: Date.now(),
-                    title: action.payload,
-                    completed: false
-                };
-
-                todos.push(todo);
-                dispatch(createAction('SAVE_TODO_ITEMS'));
-                break;
-            case 'REMOVE_TODO':
-                todos = todos.filter(function (todo) {
-                    return todo.id !== action.payload;
-                });
-                dispatch(createAction('SAVE_TODO_ITEMS'));
-                break;
-            case 'TOGGLE_TODO_STATE':
-                todos = todos.map(function (todo) {
-                    if (todo.id === action.payload) {
-                        todo.completed = !todo.completed;
-                    }
-                    return todo;
-                });
-                dispatch(createAction('SAVE_TODO_ITEMS'));
-                break;
-            case 'CLEAR_COMPLETED':
-                todos = todos.filter(function (todo) {
-                    return !todo.completed;
-                });
-                dispatch(createAction('SAVE_TODO_ITEMS'));
-                break;
-            case 'SET_FILTER':
-                filter = action.payload;
-                break;
-            case 'LOAD_TODO_ITEMS':
-                var todosAsString = localStorage.getItem('todos');
-
-                todos = JSON.parse(todosAsString) || [];
-                break;
-            case 'SAVE_TODO_ITEMS':
-                var todosAsString = JSON.stringify(todos);
-
-                localStorage.setItem('todos', todosAsString);
-                break;
-            default:
-                throw new Error('Action not supported: ' + action.type);
-        }
-
-        render(todos, filter);
-    }
-
-    function render(todos, filter) {
-        renderList(todos, filter);
-        renderCounter(todos);
-        renderFilter(filter);
-
-        function renderCounter(todos) {
-            var myCounter = document.getElementById('myCounter');
-
-            myCounter.textContent = todos.reduce(countCompleted, 0) + ' items left';
-
-            function countCompleted(accumulator, todo) {
-                accumulator += todo.completed ? 0 : 1;
-
-                return accumulator;
-            }
-        }
-
-        function renderFilter(filter) {
-            var myFilter = document.getElementById('myFilter');
-
-            myFilter.textContent = '';
-
-            var template = [
-                '<span>',
-                '   <button type="button" class="btn {{active ? \'btn-success\' : \'btn-default\'}} btn-xs" ',
-                '           onclick="dispatchSetFilterAction(\'{{filterType}}\')">',
-                '       {{filterName}}',
-                '   </button>',
-                '   &nbsp;',
-                '</span>'
-            ].join('\n');
-
-            [
-                {filterType: 'ALL', filterName: 'All', active: filter === 'ALL'},
-                {filterType: 'COMPLETED', filterName: 'Completed', active: filter === 'COMPLETED'},
-                {filterType: 'ACTIVE', filterName: 'Active', active: filter === 'ACTIVE'}
-            ].forEach(renderFilterButton);
-
-            function renderFilterButton(filterButton) {
-                myFilter.appendChild(compileTemplate(template, filterButton));
-            }
-        }
-
-        function renderList(todos, filter) {
-            var myList = document.getElementById('myList');
-
-            myList.textContent = '';
-
-            todos
-                    .filter(applyFilter)
-                    .forEach(renderListItem);
-
-            function applyFilter(todo) {
-                switch (filter) {
-                    case 'ALL':
-                        return true;
-                    case 'COMPLETED':
-                        return todo.completed;
-                    case 'ACTIVE':
-                        return !todo.completed;
-                    default:
-                        throw new Error('Filter not supported: ' + filter);
-                }
-            }
-
-            function renderListItem(todo) {
-                var template = [
-                    '<li class="list-group-item">',
-                    '   <label>',
-                    '       <input type="checkbox" {{completed ? \' checked="true"\' : \'\'}}>&nbsp;',
-                    '              {{completed ? \'<s>\' : \'\'}}{{title}}{{completed ? \'</s>\' : \'\'}}',
-                    '   </label>',
-                    '   <button class="close">',
-                    '       <span>&times;</span>',
-                    '   </button>',
-                    '</li>'
-                ].join('\n');
-                var myListItem = compileTemplate(template, todo);
-
-                document.getElementById('myList').appendChild(myListItem);
-
-                var itemCompleted = myListItem.getElementsByTagName('input')[0];
-                itemCompleted.addEventListener('change', toggleState);
-
-                var itemRemove = myListItem.getElementsByTagName('button')[0];
-                itemRemove.addEventListener('click', removeListItem);
-
-                function removeListItem() {
-                    dispatch(createAction('REMOVE_TODO', todo.id));
-                }
-
-                function toggleState() {
-                    dispatch(createAction('TOGGLE_TODO_STATE', todo.id));
-                }
-            }
-        }
-    }
-
-    function createAction(type, payload) {
-        return {
-            type: type,
-            payload: payload
-        };
     }
 </script>
 </body>
